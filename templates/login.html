@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>钉钉定时提醒系统 - 登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-header {
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #2d3748;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .login-form {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .form-control:focus {
+            border-color: #4299e1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+            background: white;
+        }
+
+        .btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(66, 153, 225, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .info-box {
+            background: #ebf8ff;
+            color: #2a69ac;
+            border: 1px solid #90cdf4;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .info-box h4 {
+            margin-bottom: 8px;
+            color: #2c5282;
+        }
+
+        .info-box ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .loading {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .version-info {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+            
+            .login-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>🔔 系统登录</h1>
+            <p>钉钉定时提醒管理系统</p>
+        </div>
+
+        {% if error %}
+        <div class="error-message">
+            ❌ {{ error }}
+        </div>
+        {% endif %}
+
+        <form class="login-form" method="POST" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" name="username" class="form-control" 
+                       placeholder="请输入用户名" required autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" class="form-control" 
+                       placeholder="请输入密码" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn" id="loginBtn">
+                <span class="loading" id="loading"></span>
+                <span id="btnText">登 录</span>
+            </button>
+        </form>
+
+        <div class="info-box">
+            <h4>💡 默认登录信息</h4>
+            <ul>
+                <li><strong>用户名:</strong> admin</li>
+                <li><strong>密码:</strong> admin123</li>
+            </ul>
+            <p><strong>⚠️ 重要:</strong> 登录后请立即修改默认密码！</p>
+        </div>
+    </div>
+
+    <div class="version-info">
+        钉钉定时提醒系统 v2.0
+    </div>
+
+    <script>
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const loginBtn = document.getElementById('loginBtn');
+            const loading = document.getElementById('loading');
+            const btnText = document.getElementById('btnText');
+            
+            // 显示加载状态
+            loginBtn.disabled = true;
+            loading.style.display = 'inline-block';
+            btnText.textContent = '登录中...';
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: formData.get('username'),
+                        password: formData.get('password')
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // 登录成功，跳转到主页
+                    btnText.textContent = '登录成功';
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 500);
+                } else {
+                    // 登录失败，显示错误信息
+                    showError(data.error || '登录失败');
+                }
+            } catch (error) {
+                console.error('登录请求失败:', error);
+                showError('网络连接失败，请稍后重试');
+            } finally {
+                // 恢复按钮状态
+                loginBtn.disabled = false;
+                loading.style.display = 'none';
+                btnText.textContent = '登 录';
+            }
+        }
+        
+        function showError(message) {
+            // 移除现有错误信息
+            const existingError = document.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // 创建新的错误信息
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = `❌ ${message}`;
+            
+            // 插入到表单前面
+            const form = document.querySelector('.login-form');
+            form.parentNode.insertBefore(errorDiv, form);
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+        
+        // 回车键登录
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                const form = document.querySelector('.login-form');
+                form.dispatchEvent(new Event('submit'));
+            }
+        });
+        
+        // 页面加载完成后聚焦到用户名输入框
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('username').focus();
+        });
+    </script>
+</body>
+</html>
